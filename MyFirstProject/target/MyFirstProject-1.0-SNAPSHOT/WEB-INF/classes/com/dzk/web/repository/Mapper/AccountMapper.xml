@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dzk.web.repository.AccountRepository">
+
+    <!--开启二级缓存 mybatis-ehcache实体类不需要实现序列化接口-->
+    <cache type="org.mybatis.caches.ehcache.EhcacheCache">
+        <!--缓存创建后，最后一次访问缓存时间至缓存失效的时间间隔-->
+        <property name="timeToIdleSeconds" value="300"/>
+        <!--缓存自创建时间起至失效的时间间隔-->
+        <property name="timeToLiveSeconds" value="300"/>
+        <!--缓存回收策略，LRU表示移出近期使用最少对象-->
+        <property name="memoryStoreEvictionPolicy" value="LRU"/>
+
+    </cache>
+
+    <select id="findByUsername" resultType="_Account" parameterType="java.lang.String">
+        select * from t_account where username=#{agr0};
+    </select>
+    <insert id="insertAccount" parameterType="_Account">
+        insert into  t_account(username,password,salt,status) value (#{username},#{password},#{salt},#{status});
+    </insert>
+    <insert id="insertPersonInfor" parameterType="_PersonalInfor">
+        insert into t_personInfor(account_id,name,mail,phoneNum,registrationDate) value (#{account_id},#{name},#{email},#{phoneNum},#{registrationDate});
+    </insert>
+
+    <select id="findIdByMail" resultType="java.lang.Long" parameterType="java.lang.String">
+        select id from t_personInfor where mail=#{arg0};
+    </select>
+
+    <select id="findUsernameById" resultType="java.lang.String" parameterType="java.util.List">
+        select username from  t_account where 
+        <foreach collection="list" open="id in (" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="findMailById" resultType="java.lang.String" parameterType="java.lang.Long">
+        select mail from t_personInfor where id=#{arg0};
+    </select>
+
+    <update id="updatePasswordById">
+        update t_account set password=#{arg1.encryptionStr},salt=#{arg1.salt} where id=#{arg0};
+    </update>
+
+    <insert id="setRoleToAccount">
+        insert into t_account_role(accountId,roleId) value (#{arg0},#{arg1});
+    </insert>
+
+    <select id="getSubjectRole" resultType="java.lang.String" parameterType="java.lang.String">
+        select r.name from t_account as a join t_account_role as ar on ar.accountId=a.id join t_role as r on r.id=ar.roleId where a.username=#{param1}
+    </select>
+
+    <select id="getAccountLogin" parameterType="long" resultType="com.dzk.web.entity.AccountLogin">
+        select name,avatarUrl from t_personInfor where id=#{param1};
+    </select>
+</mapper>

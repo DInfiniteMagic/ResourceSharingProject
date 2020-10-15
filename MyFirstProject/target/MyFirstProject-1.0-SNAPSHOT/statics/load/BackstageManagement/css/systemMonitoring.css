@@ -1,0 +1,27 @@
+
+
+#list #choiceUl li :hover{
+    fill: red;
+    color: red;
+}
+#showUsername{
+    color: black;
+    display: block;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    height: 100%;
+    width: 80px;
+    line-height: 42px;
+    margin-left:5px;
+    float: left;
+}
+#accordion .panel-body{
+    padding: 0 0 0 0;
+}
+#accordion .list-group-item{
+    text-align: center;
+}
+#accordion .panel-title{
+    text-align: center;
+}

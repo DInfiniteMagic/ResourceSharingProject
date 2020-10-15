@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dzk.web.repository.ResourceRepository">
+    <insert id="insertResource" parameterType="_UploadInfor">
+        insert into t_resourceinfor(resourceName, resourceClass, resourceValue, resourceDescription, uploadResourceName, resourceUrl, resourceStatue, uploadTime, uploadAccountId, resourceSize, resourceDownloadTimes)
+        values
+        (#{resourceName},#{resourceClass},#{resourceValue},#{resourceDescription},#{uploadResourceName},#{resourceUrl},#{resourceStatue},#{uploadTime},#{uploadAccountId},#{resourceSize},0)
+    </insert>
+    <select id="selectInitResourcesTableData" resultType="_DownloadInfor" >
+        select r.id as id,r.resourceName as downloadResourceName,r.resourceClass as resourceClass,r.resourceValue as resourceValue,
+        p.name as downloadAccountName, resourceSize as resourceSize,r.resourceDownloadTimes as  resourceDownloadTimes,
+        r.uploadTime as uploadTime,r.resourceDescription as resourceDetails,f.fid as favorites
+        from t_resourceinfor as r join t_account as a on a.id=r.uploadAccountId
+        join t_personinfor as p on a.id=p.account_id
+        left join
+            (select ff.id as fid,resource_id as rid,aa.username as ausername from t_account_favorites as ff  join t_account as aa on ff.account_id=aa.id where aa.username=#{param3}) as f on r.id = f.rid
+        where r.resourceStatue=#{param6}
+         <if test="param4!='' and param5!=null">
+            order by ${param4}  ${param5}
+         </if>
+         limit #{param1},#{param2};
+    </select>
+    <select id="findResourcesSize" resultType="java.lang.Integer">
+        select  count(r.id)
+        from t_resourceinfor as r join t_account as a on a.id=r.uploadAccountId
+        join t_personinfor as p on a.id=p.account_id
+        left join
+            (select ff.id as fid,resource_id as rid,aa.username as ausername from t_account_favorites as ff  join t_account as aa on ff.account_id=aa.id where aa.username="") as f on r.id = f.rid
+        where r.resourceStatue=#{param1}
+    </select>
+
+    <delete id="deleteFavorites">
+        delete from t_account_favorites where resource_id=#{param1} and account_id=(select id from t_account where username=#{param2});
+    </delete>
+
+    <insert id="insertFavorites">
+        insert into t_account_favorites(resource_id, account_id) values (#{param1},(select id from t_account where username=#{param2}));
+    </insert>
+
+    <select id="selectSearchContextOfDownloadTable" resultType="_DownloadInfor">
+        select r.id as id,r.resourceName as downloadResourceName,r.resourceClass as resourceClass,r.resourceValue as resourceValue,
+        p.name as downloadAccountName, resourceSize as resourceSize,r.resourceDownloadTimes as  resourceDownloadTimes,
+        r.uploadTime as uploadTime,r.resourceDescription as resourceDetails,f.fid as favorites
+        from t_resourceinfor as r join t_account as a on a.id=r.uploadAccountId
+        join t_personinfor as p on a.id=p.account_id
+        left join
+            (select ff.id as fid,resource_id as rid,aa.username as ausername from t_account_favorites as ff  join t_account as aa on ff.account_id=aa.id where aa.username=#{param7}) as f on r.id = f.rid
+        where r.resourceStatue=#{param6} and (r.resourceName like #{param1} or r.resourceClass like #{param1} or p.name like #{param1} )
+        <if test="param4!='' and param5!=null">
+            order by ${param4}  ${param5}
+         </if>
+        limit #{param2},#{param3};
+    </select>
+
+
+    <select id="findSearchContextSize" resultType="java.lang.Integer" >
+        select  count(r.id)
+        from t_resourceinfor as r join t_account as a on a.id=r.uploadAccountId
+        join t_personinfor as p on a.id=p.account_id
+        left join
+            (select ff.id as fid,resource_id as rid,aa.username as ausername from t_account_favorites as ff  join t_account as aa on ff.account_id=aa.id where aa.username="") as f on r.id = f.rid
+        where r.resourceStatue=#{param2} and (r.resourceName like #{param1} or r.resourceClass like #{param1} or p.name like #{param1} );
+    </select>
+
+    <select id="findDownloadById" parameterType="java.lang.Integer" resultType="_Download">
+        select uploadResourceName,resourceUrl from t_resourceinfor where id=#{param1};
+    </select>
+
+    <update id="updateResourceDownloadTimesById" parameterType="java.lang.Integer">
+        update t_resourceinfor set resourceDownloadTimes=resourceDownloadTimes+1 where id=#{param1};
+    </update>
+
+    <select id="selectAllResourcesClass" resultType="java.lang.String">
+        select resourceClass from t_resourcesClass
+    </select>
+
+    <select id="selectInitUploadTableData" resultType="_UploadTable">
+        select r.id as id,resourceName,resourceClass,resourceValue,uploadTime,resourceDescription from t_resourceinfor r join t_account a on r.uploadAccountId=a.id
+        where username=#{param5} and resourceStatue=#{param6}
+        <if test="param3!='' and param4!=null">
+            order by ${param3}  ${param4}
+        </if>
+        limit #{param1},#{param2};
+    </select>
+
+    <select id="findUploadSizeByUsername" resultType="java.lang.Integer">
+        select count(r.id) from t_account as a join t_resourceinfor as r on a.id=r.uploadAccountId where a.username=#{param1} and r.resourceStatue=#{param2};
+    </select>
+
+    <update id="updateUploadTable" parameterType="_ModifyUploadTable">
+        update t_resourceinfor set resourceName=#{resourceName},resourceClass=#{resourceClass},resourceValue=#{resourceValue},resourceDescription=#{resourceDescription} where id=#{id}
+    </update>
+
+    <select id="deleteUploadTable" parameterType="java.lang.Integer">
+        delete from t_resourceinfor where id=#{id};
+    </select>
+
+    <select id="deleteFavoriteByResourceId" parameterType="java.lang.Integer">
+        delete from t_account_favorites where resource_id=#{id};
+    </select>
+
+    <select id="selectResourceUrlById" resultType="java.lang.String" parameterType="java.lang.Integer">
+        select resourceUrl from t_resourceinfor where id=#{id};
+    </select>
+
+    <select id="selectAllAccountRoles" resultType="java.lang.String">
+        select name from t_role;
+    </select>
+
+    <update id="updateUploadResourcesStatueById">
+        update t_resourceinfor set resourceStatue=#{param2} where id=#{param1};
+    </update>
+</mapper>

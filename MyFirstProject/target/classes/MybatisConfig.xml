@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!--mybatis的配置文件-->
+<configuration>
+    <settings>
+        <setting name="logImpl" value="STDOUT_LOGGING"/><!--打印sql-->
+        <setting name="cacheEnabled" value="true"/> <!--开启二级缓存-->
+    </settings>
+    <typeAliases>
+        <typeAlias type="com.dzk.web.entity.Account" alias="_Account"></typeAlias>
+        <typeAlias type="com.dzk.web.entity.PersonalInfor" alias="_PersonalInfor"></typeAlias>
+        <typeAlias type="com.dzk.web.entity.UploadInfor" alias="_UploadInfor"></typeAlias>
+        <typeAlias type="com.dzk.web.entity.DownloadInfor" alias="_DownloadInfor"></typeAlias>
+         <typeAlias type="com.dzk.web.entity.Download" alias="_Download"></typeAlias>
+        <typeAlias type="com.dzk.web.entity.UploadTable" alias="_UploadTable"></typeAlias>
+        <typeAlias type="com.dzk.web.entity.ModifyUploadTable" alias="_ModifyUploadTable"></typeAlias>
+        <typeAlias type="com.dzk.web.entity.SystemMonitoring" alias="_SystemMonitoring"></typeAlias>
+        <typeAlias type="com.dzk.web.entity.OperateLogEntity" alias="_OperateLogEntity"></typeAlias>
+        <typeAlias type="com.dzk.web.entity.AccessRecordsTableData" alias="_AccessRecordsTableData"></typeAlias>
+        <typeAlias type="com.dzk.web.entity.AccountListTableData" alias="_AccountListTableData"></typeAlias>
+    </typeAliases>
+</configuration>

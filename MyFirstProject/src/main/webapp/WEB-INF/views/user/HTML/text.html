@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>太空</title>
+	<style>
+		body{
+			width: 100%;
+			height: 1000px;
+			background: linear-gradient(to bottom right, #000, #2073c2 60%, #dff6ff);
+			overflow: hidden;
+		}
+		span{
+			display: block;
+			position: absolute;
+			border-radius: 50%;
+			box-shadow: 0.4px 0.4px 0.4px 0px #fff;
+		}
+	</style>
+</head>
+<body>
+
+<script>
+	window.onload = function(){
+		var screenW = document.documentElement.clientWidth;
+		var screenH = document.documentElement.clientHeight;
+		var colorArr = ['#CCC','skyblue','orange'];
+		console.log(screenW);
+		for( var i=0; i<800; i++ ){
+			var span = document.createElement('span');
+			var width = Math.random() * 3;
+			var colorIndex = parseInt(Math.random() * 3);
+			var x = parseInt(Math.random() * screenW);
+			var y = parseInt(Math.random() * screenH);
+			span.style.width = parseInt(width) + 'px';
+			span.style.height = parseInt(width) + 'px';
+			span.style.background = colorArr[colorIndex];
+			span.style.left = x + 'px';
+			span.style.top = y + 'px';
+
+			document.body.appendChild(span);
+		}
+	}
+</script>
+
+</body>
+</html>

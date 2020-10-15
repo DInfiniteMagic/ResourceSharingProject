@@ -1,0 +1,35 @@
+{
+"page": "2",
+"total": "3",
+"records": "100",
+"rows":[
+  {
+    "id": "1",
+    "username": "adminManager",
+    "roleName": "admin",
+    "registrationDate": "2020-07-27 22:42:21",
+    "status": "正常"
+  },
+  {
+    "id": "2",
+    "username": "adminManager11",
+    "roleName": "user",
+    "registrationDate": "2020-07-27 22:42:21",
+    "status": "冻结"
+    },
+   {
+    "id": "3",
+    "username": "adminManage",
+    "roleName": "superUser",
+    "registrationDate": "2020-07-27 22:42:21",
+    "status": "正常"
+  },
+   {
+    "id": "4",
+    "username": "adminManage2",
+    "roleName": "admin",
+    "registrationDate": "2020-07-27 22:42:21",
+    "status": "冻结"
+  }
+]
+}

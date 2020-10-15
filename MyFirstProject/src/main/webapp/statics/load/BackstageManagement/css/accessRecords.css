@@ -1,0 +1,71 @@
+thead #ui-jqgrid-labels tr {
+    height: 30px;
+}
+#ui-jqgrid-hdiv #ui-jqgrid-hbox{
+   height: 30px;
+}
+.ui-jqgrid-view {
+    font-size: 20px;
+}/*表格字体大小*/
+ .ui-jqgrid .ui-jqgrid-htable th {
+    height: 40px;
+    font-size: 20px;
+     background-color: #D9534F;
+     border: 1px solid white;
+ }/*标题*/
+.ui-jqgrid .ui-jqgrid-htable th div:hover{
+    color: black!important;
+}
+ .ui-jqgrid .ui-jqgrid-htable th div{
+     height: 40px!important;
+     line-height: 40px;
+     color: white;
+ }/*标题*/
+.ui-jqgrid tr.ui-row-ltr td {
+    text-align: center;
+}
+.ui-jqgrid .ui-jqgrid-bdiv{ overflow-x: hidden; border:none}
+.ui-jqgrid-hdiv .ui-jqgrid-hbox table {
+    border-bottom:1px solid;
+}
+#pager table{
+    height: 45px;
+}
+#pager table td span{
+    font-size: 18px;
+}
+#input_pager input{
+    height: 20px;
+    font-size: 15px;
+}
+#input_pager span{
+    font-size: 15px;
+}
+#sp_1_pager{/*共x页*/
+    font-size: 15px!important;
+}
+#pager select{
+    height: 20px!important;
+}
+
+.ui-jqgrid-hbox .s-ico span{
+    margin-top: 3px;
+    display: block;
+    height:25px;
+}
+.ui-jqgrid-hbox .s-ico .glyphicon{
+    font-size: 12px!important;
+}
+#operation{
+    font-size: 17px;
+}
+.ui-jqgrid tr.jqgrow td {
+    text-overflow : ellipsis;
+}
+.ui-jqgrid tr.jqgrow td {
+    vertical-align:text-top;
+    display: table-cell;
+}
+.ui-jqgrid tr.ui-row-ltr td{
+    text-align: center!important;
+}

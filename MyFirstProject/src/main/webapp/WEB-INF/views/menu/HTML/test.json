@@ -1,0 +1,55 @@
+{
+"page": "2",
+"total": "3",
+"records": "100",
+"rows":[
+  {
+    "id": "1",
+    "downloadResourceName": "叶问4.mp4",
+    "resourceClass": "安全计数",
+    "resourceDetails": "1213236",
+    "resourceValue": "1",
+    "downloadAccountName": "张三",
+    "resourceSize": "1024k",
+    "uploadTime": "2020/07",
+    "resourceDownloadTimes": "500",
+    "favorites": "1"
+  },
+  {
+    "id": "2",
+    "downloadResourceName": "无双.mp4",
+    "resourceClass": "安全计数",
+    "resourceDetails": "121312116",
+    "resourceValue": "1",
+    "downloadAccountName": "张三",
+    "resourceSize": "1024k",
+    "uploadTime": "2020/07",
+    "resourceDownloadTimes": "500",
+    "favorites": ""
+  },
+  {
+    "id": "3",
+    "downloadResourceName": "叶问.mp4",
+    "resourceClass": "安全计数",
+    "resourceDetails": "12156",
+    "resourceValue": "1",
+    "downloadAccountName": "张三",
+    "resourceSize": "1024k",
+    "uploadTime": "2020/07",
+    "resourceDownloadTimes": "500",
+    "favorites": "1"
+  },
+  {
+    "id": "6",
+    "downloadResourceName": "喜剧.mp4",
+    "resourceClass": "安全计数",
+    "resourceDetails": "asdasdasdasdadasdasdasdasdasdasdasdasdasda",
+    "resourceValue": "1",
+    "downloadAccountName": "张三",
+    "resourceSize": "1024k",
+    "uploadTime": "2020/07",
+    "resourceDownloadTimes": "500",
+    "favorites": ""
+  }
+]
+}

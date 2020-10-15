@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:c="http://www.springframework.org/schema/c" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <!--引入属性文件-->
+    <context:property-placeholder location="classpath:applicationProperties.properties" ></context:property-placeholder>
+
+    <!-- 使用Annotation自动注册Bean，解决事物失效问题：在主容器中不扫描@Controller注解，在SpringMvc中只扫描@Controller注解。  -->
+    <context:component-scan base-package="com.dzk.*" use-default-filters="true"><!-- base-package 如果多个，用“,”分隔 -->
+            <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+   <import resource="classpath:SpringShiroConfig.xml"></import><!--引入shiro的配置文件-->
+
+    <!--jdbc连接池 start-->
+    <bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <!-- 初始化连接大小 -->
+        <property name="initialSize" value="${jdbc_initialSize}"/>
+        <!-- 连接池最大使用连接数量 -->
+        <property name="maxActive" value="${jdbc_maxActive}"/>
+        <!-- 连接池最小空闲 -->
+        <property name="minIdle" value="${jdbc_minIdle}"/>
+        <!-- 获取连接最大等待时间 -->
+        <property name="maxWait" value="${jdbc_maxWait}"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="validationQuery" value="${validationQuery}"/>
+         <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="300000"/>
+        <!-- 打开removeAbandoned功能 -->
+        <property name="removeAbandoned" value="true"/>
+        <!-- 1800秒，也就是30分钟 -->
+        <property name="removeAbandonedTimeout" value="1800"/>
+        <!-- 关闭abanded连接时输出错误日志 -->
+        <property name="logAbandoned" value="true"/>
+         <!-- 监控数据库 -->
+        <!-- 配置监控统计拦截的filters -->
+        <property name="filters" value="stat,wall,log4j"/>
+        <!-- 监控统计拦截的filters -->
+        <!-- 并在filters属性中配置了log4j -->
+        <property name="proxyFilters">
+            <list>
+                <ref bean="stat-filter"/>
+                <ref bean="log4jFilter"/>
+            </list>
+        </property>
+        <!--<property name="filters" value="mergeStat"/>-->
+
+    </bean>
+    <bean id="log4jFilter" class="com.alibaba.druid.filter.logging.Log4jFilter">
+         <!-- 所有连接相关的日志 -->
+        <property name="connectionLogEnabled" value="false"/>
+        <!-- 所有Statement相关的日志 -->
+        <property name="statementLogEnabled" value="false"/>
+        <!-- 是否显示结果集 -->
+        <property name="resultSetLogEnabled" value="true"/>
+        <!-- 是否显示SQL语句 -->
+        <property name="statementExecutableSqlLogEnable" value="true"/>
+    </bean>
+
+    <!-- 慢SQL记录-->
+    <bean id="stat-filter" class="com.alibaba.druid.filter.stat.StatFilter">
+        <property name="mergeSql" value="true"/>
+        <property name="slowSqlMillis" value="10000"/>
+        <property name="logSlowSql" value="true"/>
+    </bean>
+    <!--jdbc连接池 end -->
+
+    <!--Mybatis start-->
+    <bean name="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="mapperLocations" value="classpath:/com/dzk/web/repository/Mapper/*.xml"></property>
+        <property name="configLocation" value="classpath:MybatisConfig.xml"></property>
+    </bean>
+
+    <bean name="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" c:_0-ref="sqlSessionFactory"></bean>
+
+    <!--Mybatis end-->
+
+    <!--事务处理 start-->
+    <bean name="tx" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <tx:advice transaction-manager="tx" id="txAdvice">
+        <tx:attributes>
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config proxy-target-class="true">
+        <aop:pointcut id="pointcut" expression="execution(* com.dzk.web.*.*.*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut"></aop:advisor>
+    </aop:config>
+    <!--事务处理 end-->
+
+
+    <!-- MyBatis使用ehcache缓存 start -->
+    <bean id="ehCacheManager"
+          class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation" value="classpath:ehcache.xml" />
+        <property name="shared" value="true"></property> <!-- 这里是关键！！！没有必错  -->
+    </bean>
+    <!-- end MyBatis使用ehcache缓存 -->
+
+    <!--Spring validator 方法级别的校验 begin -->
+    <bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor"></bean>
+
+    <!--Spring validator 方法级别的校验 end -->
+
+    <!--定时任务-->
+    <task:scheduled-tasks><!--每隔59分钟执行一次-->
+        <task:scheduled ref="systemManagementServiceImpl" method="autoSavaSystemMonitory" cron="* */59 * * * ?"></task:scheduled>
+    </task:scheduled-tasks>
+
+
+    <!--aop 实现业务和异常日志记录-->
+    <aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
+
+    <bean id="myHandler" class="com.dzk.web.webSocket.WebsocketHandler"></bean>
+
+
+
+</beans>

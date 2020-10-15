@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>文件下载</title>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <!--BootstrapValidator -->
+    <!--jqgrid-->
+    <!--jqgrid 核心-->
+    <script src="../../../../statics/jqgrid/js/jquery.jqGrid.min.js"></script>
+    <!--jqgrid 国际化-->
+    <script src="../../../../statics/jqgrid/js/grid.locale-cn.js"></script>
+    <!--jqgrid 适配bootstrap样式 css-->
+    <link rel="stylesheet" href="../../../../statics/jqgrid/css/ui.jqgrid-bootstrap.css" />
+    <!--jqgrid 核心 css-->
+    <link rel="stylesheet" href="../../../../statics/jqgrid/css/ui.jqgrid.css" />
+    <!--背景-->
+    <link rel="stylesheet" href="../../../../statics/backgroundDynamic/css/StarrySky.css" />
+     <script src="../../../../statics/backgroundDynamic/js/StarrySky.js"></script>
+
+
+    <style>
+        #list #choiceUl li :hover{
+            fill: red;
+            color: red;
+        }
+        thead #ui-jqgrid-labels tr {
+            height: 30px;
+        }
+       #ui-jqgrid-hdiv #ui-jqgrid-hbox{
+           height: 30px;
+       }
+        .ui-jqgrid-view {
+            font-size: 20px;
+        }/*表格字体大小*/
+         .ui-jqgrid .ui-jqgrid-htable th {
+            height: 40px;
+            font-size: 20px;
+             background-color: #D9534F;
+             border: 1px solid white;
+         }/*标题*/
+        .ui-jqgrid .ui-jqgrid-htable th div:hover{
+            color: black!important;
+        }
+         .ui-jqgrid .ui-jqgrid-htable th div{
+             height: 40px!important;
+             line-height: 40px;
+             color: white;
+         }/*标题*/
+        .ui-jqgrid tr.ui-row-ltr td {
+            text-align: center;
+        }
+        .ui-jqgrid .ui-jqgrid-bdiv{ overflow-x: hidden; border:none}
+        .ui-jqgrid-hdiv .ui-jqgrid-hbox table {
+            border-bottom:1px solid;
+        }
+        #pager table{
+            height: 45px;
+        }
+        #pager table td span{
+            font-size: 18px;
+        }
+        #input_pager input{
+            height: 20px;
+            font-size: 15px;
+        }
+        #input_pager span{
+            font-size: 15px;
+        }
+        #sp_1_pager{/*共x页*/
+            font-size: 15px!important;
+        }
+        #pager select{
+            height: 20px!important;
+        }
+
+        .ui-jqgrid-hbox .s-ico span{
+            margin-top: 3px;
+            display: block;
+            height:25px;
+        }
+        .ui-jqgrid-hbox .s-ico .glyphicon{
+            font-size: 18px!important;
+        }
+        #operation{
+            font-size: 17px;
+        }
+    </style>
+    <script>
+        $(function () {
+            //表格初始化
+            $("#resourcesList").jqGrid({/*属性*/
+                styleUI:"Bootstrap",/*设置表格风格*/
+                url:"test.json",
+                datatype:"json",//预期服务器返回结果类型
+                mtype:"post",
+                colNames: ["编号","资源名称","所属类别","所需积分","上传者","资源大小","上传时间","下载次数", "资源详情","收藏","下载"],
+                colModel:[
+                    {name:"id",resizable:false},
+                    {name:"downloadResourceName",resizable:false,sortable:false},
+                    {name:"resourceClass",resizable:false,sortable:false},
+                    {name:"resourceValue",resizable:false},
+                    {name:"downloadAccountName",resizable:false,sortable:false},
+                    {name:"resourceSize",resizable:false},
+                    {name:"uploadTime",resizable:false},
+                    {name:"resourceDownloadTimes",resizable:false},
+                    {name:"resourceDetails",resizable:false,width:120,sortable:false,formatter:function (cellvalue, options, rowObject) {
+                        return "<button onclick='showDetails(\""+cellvalue+"\")' type='button' class='btn btn-success  btn-block' data-toggle='modal' data-target='#showDetails'>详情</button>"
+                    }},
+                    {name:"favorites",resizable:false,sortable:false,width:120,formatter:function (cellvalue, options, rowObject) {
+                         var id=rowObject.id;
+                        if(cellvalue==""){
+
+                            var content=
+                                "<button onclick='favorites("+id+")' type=\"button\" class=\"btn btn-default btn-block\">" +
+                                "  <span  class=\"glyphicon glyphicon-star-empty\" aria-hidden=\"true\"></span>收藏" +
+                                "</button>"
+                            return content;
+                        }else{
+                            var content=
+                                "<button onclick='favorites("+id+")'  type=\"button\" class=\"btn btn-default btn-block\">" +
+                                "  <span  class=\"glyphicon glyphicon-star\" aria-hidden=\"true\"></span>收藏" +
+                                "</button>"
+                            return content;
+                        }
+                    }},
+                    {resizable:false,sortable:false,width:160,width:120,formatter:function (cellvalue, options, rowObject) {
+                        var id=rowObject.id;
+                        return "<button onclick='download("+id+")' type=\"button\" class=\"btn btn-info btn-block\">" +
+                                "  <span class=\"glyphicon glyphicon-download-alt\" aria-hidden=\"true\"></span>下载" +
+                                "</button>"
+                    }}
+                ],
+                height:"100%",
+                width:"100%",
+                pager:"#pager",//设置分页工具栏html
+                    // 注意: 1.一旦设置分页工具栏之后在根据指定url查询时自动向后台传递page(当前页) 和 rows(每页显示记录数)两个参数
+                rowNum:6,//这个代表每页显示记录数
+                rowList:[6,12,24],//生成可以指定显示每页展示多少条下拉列表
+                viewrecords:true,//显示总记录数
+            }).navGrid(
+               "#pager",
+            )
+            $(window).resize(function(){
+                $("#resourcesList").setGridWidth($("#tableDiv").width());
+            });
+        })
+        function  showDetails(value) {
+            $(".modal-body").html(value);
+        }
+        function download(id) {
+            console.log(id);
+        }
+        function favorites(id) {
+            console.log(id);
+        }
+    </script>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div class="container-fluid" >
+    <div class="row" id="headRow">
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#list" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">
+                        <img alt="Brand" class="img-rounded" style="margin-top: -10px" src="../../../../statics/photo/Brand6.png">
+                    </a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="list">
+                    <ul class="nav navbar-nav  navbar-left" >
+                        <li class="active">
+                            <a href="#">
+                                资源下载
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                资源上传
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                资源求助
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                商城
+                            </a>
+                        </li>
+
+                        <!--此处需要权限控制-->
+                        <li>
+                            <a href="#">
+                                后台管理
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav  navbar-right" id="choiceUl">
+                        <li>
+                            <a href="#" style="padding: 7px 8px">
+                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1594540734521" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="2727" width="32" height="32"><defs><style type="text/css"/></defs><path d="M585.2 165.9c-7.6 0-13.8-6.2-13.8-13.8 0-32.7-26.6-59.2-59.2-59.2S453 119.4 453 152.1c0 7.6-6.2 13.8-13.8 13.8s-13.8-6.2-13.8-13.8c0-47.9 38.9-86.8 86.8-86.8s86.8 38.9 86.8 86.8c0 7.6-6.2 13.8-13.8 13.8zM512.2 959.3c-64.6 0-117.1-52.5-117.1-117.1 0-7.6 6.2-13.8 13.8-13.8s13.8 6.2 13.8 13.8c0 49.3 40.1 89.5 89.5 89.5s89.5-40.1 89.5-89.5c0-7.6 6.2-13.8 13.8-13.8s13.8 6.2 13.8 13.8c-0.1 64.6-52.6 117.1-117.1 117.1z" p-id="2728"/><path d="M833.6 857.2H190.7c-27 0-49-22-49-49 0-2.4 0.7-4.9 1.9-7l86-146.9V418.2c0-155.8 126.7-282.5 282.5-282.5s282.5 126.7 282.5 282.5v236.2l86 146.9c1.2 2.1 1.9 4.5 1.9 7 0 26.9-21.9 48.9-48.9 48.9z m-663.9-45.6c1.6 10.2 10.4 18 21.1 18h642.8c10.6 0 19.5-7.8 21.1-18L769 665.1c-1.2-2.1-1.9-4.5-1.9-7V418.2c0-140.5-114.3-254.9-254.9-254.9S257.3 277.6 257.3 418.2v239.9c0 2.4-0.7 4.9-1.9 7l-85.7 146.5z" p-id="2729"/></svg>
+                                <div style="position:absolute;width: 20px;height: 15px;border-radius: 20px;margin:-34px 0px 0px 18px; background-color: red"><div style="color: white;font-size: 10px;text-align: center;line-height:15px">99</div></div>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="#">
+                                <!--用户登录信息-->
+                                登录/注册
+                            </a>
+                        </li>
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </div>
+        </nav>
+    </div>
+    <!--搜索框-->
+    <div class="row">
+        <form class="form-inline " id="searchForm" style="margin-top: 60px">
+            <div class="col-md-3"></div>
+            <div class="form-group col-md-7">
+                <div class="form-group col-md-8">
+                    <input type="text" style="width:100%;" class="form-control input-lg " id="searchInput" placeholder="搜索">
+                </div>
+                <div class="form-group col-md-2">
+                    <input type="button" class="btn btn-danger btn-lg btn-block " value="搜索">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    </div>
+    <div class="row" style="margin-top: 50px;" >
+        <div class="col-md-1"></div>
+         <div class="col-md-10 " id="tableDiv" style="padding-right:0px ">
+             <table id="resourcesList" style="background-color: white;width: 100%">
+            </table>
+             <!--分页工具栏-->
+             <div id="pager" style="background-color: white;height: 60px" ></div>
+         </div>
+        <div class="col-md-1"></div>
+    </div>
+
+<!--显示详情的模态框-->
+<!-- Button trigger modal -->
+<!-- Modal -->
+<div class="modal fade" id="showDetails" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">资源详情</h4>
+      </div>
+      <div class="modal-body">
+        详情
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <!--<button type="button" class="btn btn-primary">Save changes</button>-->
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

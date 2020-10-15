@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dzk.web.repository.SystemManagementRepository">
+    <!--开启二级缓存 mybatis-ehcache实体类不需要实现序列化接口-->
+    <cache type="org.mybatis.caches.ehcache.EhcacheCache">
+        <!--缓存创建后，最后一次访问缓存时间至缓存失效的时间间隔-->
+        <property name="timeToIdleSeconds" value="1500"/>
+        <!--缓存自创建时间起至失效的时间间隔-->
+        <property name="timeToLiveSeconds" value="1500"/>
+        <!--缓存回收策略，LRU表示移出近期使用最少对象-->
+        <property name="memoryStoreEvictionPolicy" value="LRU"/>
+    </cache>
+    <select id="selectDataBaseSize" resultType="java.lang.Long" parameterType="java.lang.String">
+        select sum(DATA_LENGTH)+sum(INDEX_LENGTH) from information_schema.tables
+        where table_schema=#{arg0};
+    </select>
+    <insert id="insertSystemMonitorData" parameterType="_SystemMonitoring">
+        insert into t_systemmonitor(time,RAMPERCENTAGE, CPUPERCENTAGE, JVMPERCENTAGE, HARDDISKPERCENTAGE)
+        values
+        (#{time},#{RAMPercentage},#{CPUPercentage},#{JVMPercentage},#{HardDiskPercentage});
+    </insert>
+    <select id="selectSystemMonitorData" resultType="_SystemMonitoring">
+        select * from t_systemmonitor order by id desc limit 0 ,9;
+    </select>
+
+    <select id="selectAccessRecordsTableData" resultType="_AccessRecordsTableData">
+    select r.id,ipHost,userAccount,name as userRole,operateTime,moduleType,operateContent from  t_recordoperatelog as r
+    left join t_account as a on a.username=r.userAccount
+    left join t_account_role as ar on ar.accountId=a.id
+    left join t_role as ro on ro.id=ar.roleId
+    <if test="param3!='' and param4!=null">
+            order by ${param3}  ${param4}
+    </if>
+        limit #{param1},#{param2};
+    </select>
+
+    <select id="selectCountAccessRecordsTableData" resultType="java.lang.Long">
+        select count(r.id) from  t_recordoperatelog as r
+    left join t_account as a on a.username=r.userAccount
+    left join t_account_role as ar on ar.accountId=a.id
+    left join t_role as ro on ro.id=ar.roleId;
+    </select>
+
+    <select id="selectAccessRecordsBySearch" resultType="_AccessRecordsTableData">
+    select r.id,ipHost,userAccount,name as userRole,operateTime,moduleType,operateContent from  t_recordoperatelog as r
+    left join t_account as a on a.username=r.userAccount
+    left join t_account_role as ar on ar.accountId=a.id
+    left join t_role as ro on ro.id=ar.roleId
+     where name like #{param1} or operateContent like #{param1} or userAccount like #{param1} or moduleType like #{param1}
+    <if test="param4!='' and param5!=null">
+            order by ${param3}  ${param4}
+    </if>
+        limit #{param2},#{param3};
+    </select>
+
+
+    <select id="selectCountAccessRecordsTableDataBySearch" resultType="java.lang.Long">
+        select count(r.id) from  t_recordoperatelog as r
+    left join t_account as a on a.username=r.userAccount
+    left join t_account_role as ar on ar.accountId=a.id
+    left join t_role as ro on ro.id=ar.roleId
+    where name like #{param1} or operateContent like #{param1} or userAccount like #{param1} or moduleType like #{param1};
+    </select>
+
+
+    <select id="selectAccountListTableData" resultType="_AccountListTableData">
+        select a.id as id,username,status,r.name as roleName,registrationDate from t_account as a
+    left join t_account_role as ar on ar.accountId=a.id
+    left join t_role as r on r.id=ar.roleId
+    left join t_personinfor tp on a.id=tp.account_id
+    <if test="param3!='' and param4!=null">
+            order by ${param3}  ${param4}
+    </if>
+        limit #{param1},#{param2};
+    </select>
+
+    <select id="selectAccountListTableDataSize" resultType="java.lang.Long">
+        select count(id) from t_account;
+    </select>
+
+
+    <select id="selectAccountListBySearch" resultType="_AccountListTableData">
+        select a.id as id,username,status,r.name as roleName,registrationDate from t_account as a
+    left join t_account_role as ar on ar.accountId=a.id
+    left join t_role as r on r.id=ar.roleId
+    left join t_personinfor tp on a.id=tp.account_id
+     where username like #{param1} or status like #{param1} or r.name like #{param1}
+    <if test="param4!='' and param5!=null">
+            order by ${param3}  ${param4}
+    </if>
+        limit #{param2},#{param3};
+    </select>
+
+    <select id="selectAccountListTableDataSizeBySearch" resultType="java.lang.Long">
+         select count(a.id)
+    from t_account as a
+    left join t_account_role as ar on ar.accountId=a.id
+    left join t_role as r on r.id=ar.roleId
+    left join t_personinfor tp on a.id=tp.account_id
+    where username like #{param1} or status like #{param1} or roleName like #{param1}
+    </select>
+
+    <update id="updateAccountListTable">
+        update  t_account as a
+    left join t_account_role as ar on ar.accountId=a.id
+    left join t_role as r on r.id=ar.roleId
+    left join t_personinfor tp on a.id=tp.account_id  set a.status = #{param3} , ar.roleId=(select id from t_role where name=#{param2}) where a.id=#{param1};
+    </update>
+</mapper>

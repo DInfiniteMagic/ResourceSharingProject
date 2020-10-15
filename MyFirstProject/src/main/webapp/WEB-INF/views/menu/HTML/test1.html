@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>使用jqgrid表格</title>
+     <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <!--BootstrapValidator -->
+    <!--jqgrid-->
+    <!--jqgrid 核心-->
+    <script src="../../../../statics/jqgrid/js/jquery.jqGrid.min.js"></script>
+    <!--jqgrid 国际化-->
+    <script src="../../../../statics/jqgrid/js/grid.locale-cn.js"></script>
+    <!--jqgrid 适配bootstrap样式 css-->
+    <link rel="stylesheet" href="../../../../statics/jqgrid/css/ui.jqgrid-bootstrap.css" />
+    <!--jqgrid 核心 css-->
+    <link rel="stylesheet" href="../../../../statics/jqgrid/css/ui.jqgrid.css" />
+    <script>
+        $(function(){
+
+            //表格初始化
+            $("#userlist").jqGrid({
+                styleUI:"Bootstrap",//设置为bootstrap风格的表格
+                url:"./users.json",//获取服务端数据url 注意获取结果要json
+                datatype:"json",//预期服务器返回结果类型
+                mtype:"post",//请求方式
+                colNames:["编号","姓名","年龄","生日"],//列名称数组
+                colModel:[
+                    {name:"id"},//colModel中全部参数都写在列配置对象
+                    {name:"name",editable:true},
+                    {name:"age"},
+                    {name:"bir"},
+                ],//列数组值配置列对象
+                pager:"#pager",//设置分页工具栏html
+                    // 注意: 1.一旦设置分页工具栏之后在根据指定url查询时自动向后台传递page(当前页) 和 rows(每页显示记录数)两个参数
+                rowNum:2,//这个代表每页显示记录数
+                rowList:[2,4,10,20],//生成可以指定显示每页展示多少条下拉列表
+                viewrecords:true,//显示总记录数
+                caption:"用户列表",//表格标题
+                cellEdit:true,//开启单元格编辑功能
+            }).navGrid("#pager"
+
+            );
+        });
+    </script>
+</head>
+<body>
+
+
+    <!--创建表格-->
+    <table id="userlist"></table>
+
+    <!--分页工具栏-->
+    <div id="pager"></div>
+
+</body>
+</html>
